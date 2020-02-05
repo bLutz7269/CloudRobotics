@@ -11,6 +11,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.toRadians;
+
 abstract public class Robot extends OpMode {
     DcMotor ldb;
     DcMotor ldf;
@@ -27,6 +31,9 @@ abstract public class Robot extends OpMode {
     Orientation lastAngles = new Orientation();
 
     double globalAngle;
+
+    private double xLocation;
+    private double yLoctation;
 
     double left_encoder=0;
     double left_encoder_prev;
@@ -177,7 +184,7 @@ abstract public class Robot extends OpMode {
         rdf.setMode(DcMotor.RunMode.RUN_TO_POSITION);
     }
 
-    public void driveBack(double inches, double power, RobotLocation robotLocation, Boolean opmode){
+    public void driveBack(double inches, double power, Boolean opmode){
         ldf.setTargetPosition((int)(-inches * 90) + ldf.getCurrentPosition());
         ldb.setTargetPosition((int)(-inches * 90) + ldb.getCurrentPosition());
         rdb.setTargetPosition((int)(-inches * 90) + rdb.getCurrentPosition());
@@ -194,19 +201,19 @@ abstract public class Robot extends OpMode {
             ldb.setPower(power - getError());
             rdb.setPower(power + getError());
             rdf.setPower(power+ getError());
-            robotLocation.setLocation((getAngle()),encodersToInches());
+            setLocation((getAngle()),encodersToInches());
             telemetry.addData("ldf encoder-fwd", ldf.getCurrentPosition() + "  busy=" + ldf.isBusy());
             telemetry.addData("ldb encoder-fwd", ldb.getCurrentPosition() + "  busy=" + ldb.isBusy());
             telemetry.addData("rdf encoder-fwd", rdf.getCurrentPosition() + "  busy=" + rdf.isBusy());
             telemetry.addData("rdb encoder-fwd", rdb.getCurrentPosition() + "  busy=" + rdb.isBusy());
             telemetry.addData("Robot Angle:", + getAngle());
-            telemetry.addData("RobotX:", robotLocation.getxLocation());
-            telemetry.addData("RobotY:", robotLocation.getyLoctation());
+            telemetry.addData("RobotX:", xLocation);
+            telemetry.addData("RobotY:", yLoctation);
             telemetry.update();
         }
     }
 
-    public void driveForward(double inches, double power, boolean intakeAtEnd, RobotLocation robotLocation, Boolean opmode){
+    public void driveForward(double inches, double power, boolean intakeAtEnd, Boolean opmode){
         ldf.setTargetPosition((int)(inches * 90) + ldf.getCurrentPosition());
         ldb.setTargetPosition((int)(inches * 90) + ldb.getCurrentPosition());
         rdb.setTargetPosition((int)(inches * 90) + rdb.getCurrentPosition());
@@ -226,12 +233,12 @@ abstract public class Robot extends OpMode {
             ldb.setPower(power - getError());
             rdb.setPower(power + getError());
             rdf.setPower(power+ getError());
-            robotLocation.setLocation((getAngle()),encodersToInches());
+            setLocation((getAngle()),encodersToInches());
             telemetry.addData("left Encoder", left_encoder + "  busy=" + ldf.isBusy());
             telemetry.addData("right Encoder", right_encoder + "  busy=" + rdf.isBusy());
             telemetry.addData("Robot Angle:", + getAngle());
-            telemetry.addData("RobotX:", robotLocation.getxLocation());
-            telemetry.addData("RobotY:", robotLocation.getyLoctation());
+            telemetry.addData("RobotX:", xLocation);
+            telemetry.addData("RobotY:", yLoctation);
             telemetry.update();
         }
 
@@ -279,5 +286,14 @@ abstract public class Robot extends OpMode {
         }
 
     }
+
+    public void setLocation(double currentAngle, double inches){
+        xLocation += (cos(toRadians(currentAngle)) * inches);
+        yLoctation += (sin(toRadians(currentAngle)) * inches);
+    }
+
+
+    public double getxLocation() {return xLocation;}
+    public double getyLoctation() { return yLoctation; }
 
 }
